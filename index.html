@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editorial Blog</title>
+
+    <!-- Include marked.js for Markdown parsing and Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-dark.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+
+    <style>
+        /* ==========================================================================
+           CSS Variables for Color Palette
+           ========================================================================== */
+           :root {
+               --bg-color:       #faf9f7; /* Warm off-white/cream background matching the article */
+               --text-color:     #2c2c2c; /* Dark charcoal text for high readability */
+               --accent-color:   #4a4a4a; /* Medium gray for links and accents */
+               --border-color:   #e8e6e3; /* Subtle warm gray for borders and dividers */
+               --code-bg:        #f4f3f1; /* Very light warm gray for code blocks */
+               --blockquote-bg:  #f4f3f1; /* Matching light background for blockquotes */
+               --footnote-color: #6b6b6b; /* Medium gray for footnotes and secondary text */
+           }
+
+           /* Dark mode color overrides using prefers-color-scheme */
+           @media (prefers-color-scheme: dark) {
+               :root {
+                   --bg-color:       #1a1a1a; /* Deep charcoal background for dark mode */
+                   --text-color:     #e8e6e3; /* Warm light text matching the light mode border */
+                   --accent-color:   #a8a8a8; /* Light gray for links in dark mode */
+                   --border-color:   #333333; /* Dark gray border color */
+                   --code-bg:        #242424; /* Slightly lighter than background for code blocks */
+                   --blockquote-bg:  #242424; /* Matching dark background for blockquotes */
+                   --footnote-color: #999999; /* Medium light gray for footnotes in dark mode */
+               }
+           }
+
+        /* ==========================================================================
+           Base Typography & Layout
+           ========================================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            font-size: 18px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* ==========================================================================
+           Header with Search Bar
+           ========================================================================== */
+        .header {
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .site-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-bar {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 0.9rem;
+            width: 250px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-bar:focus {
+            border-color: var(--accent-color);
+        }
+
+        .search-bar::placeholder {
+            color: var(--text-color);
+            opacity: 0.6;
+        }
+
+        /* ==========================================================================
+           Main Content Container
+           ========================================================================== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 800px 200px;
+            gap: 2rem;
+            padding: 2rem;
+            position: relative;
+        }
+
+        /* Left spacer for balanced layout */
+        .left-spacer {
+            /* Empty column for balanced layout */
+        }
+
+        /* Main content area - optimized for 60-65 characters per line */
+        .main-content {
+            position: relative;
+        }
+
+        /* Right margin for footnotes */
+        .footnote-margin {
+            position: relative;
+        }
+
+        /* ==========================================================================
+           Article Styling
+           ========================================================================== */
+        .post {
+            margin-bottom: 4rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .post:last-child {
+            border-bottom: none;
+        }
+
+        .post-content h1,
+        .post-content h2,
+        .post-content h3,
+        .post-content h4,
+        .post-content h5,
+        .post-content h6 {
+            margin: 2rem 0 1rem 0;
+            line-height: 1.3;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .post-content h1 { font-size: 2.2rem; }
+        .post-content h2 { font-size: 1.8rem; }
+        .post-content h3 { font-size: 1.5rem; }
+        .post-content h4 { font-size: 1.3rem; }
+        .post-content h5 { font-size: 1.1rem; }
+        .post-content h6 { font-size: 1rem; }
+
+        .post-content p {
+            margin: 1.5rem 0;
+            text-align: justify;
+            hyphens: auto;
+        }
+
+        .post-content a {
+            color: var(--accent-color);
+            text-decoration: underline;
+            transition: opacity 0.3s ease;
+        }
+
+        .post-content a:hover {
+            opacity: 0.8;
+        }
+
+        /* ==========================================================================
+           Lists
+           ========================================================================== */
+        .post-content ul,
+        .post-content ol {
+            margin: 1.5rem 0;
+            padding-left: 2rem;
+        }
+
+        .post-content li {
+            margin: 0.5rem 0;
+        }
+
+        /* ==========================================================================
+           Blockquotes
+           ========================================================================== */
+        .post-content blockquote {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background-color: var(--blockquote-bg);
+            border-left: 4px solid var(--accent-color);
+            font-style: italic;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* ==========================================================================
+           Code Blocks and Inline Code
+           ========================================================================== */
+        .post-content code {
+            background-color: var(--code-bg);
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .post-content pre {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background-color: var(--code-bg);
+            border-radius: 6px;
+            overflow-x: auto;
+            line-height: 1.4;
+        }
+
+        .post-content pre code {
+            background: none;
+            padding: 0;
+        }
+
+        /* ==========================================================================
+           Tables
+           ========================================================================== */
+        .post-content table {
+            width: 100%;
+            margin: 2rem 0;
+            border-collapse: collapse;
+            border: 1px solid var(--border-color);
+        }
+
+        .post-content th,
+        .post-content td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+
+        .post-content th {
+            background-color: var(--code-bg);
+            font-weight: bold;
+        }
+
+        /* ==========================================================================
+           Images
+           ========================================================================== */
+        .post-content img {
+            max-width: 100%;
+            height: auto;
+            margin: 2rem 0;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ==========================================================================
+           Text Highlighting (==text== syntax)
+           ========================================================================== */
+        .highlight {
+            background-color: #FEFBC7;
+            color: var(--text-color);
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+        }
+
+        /* ==========================================================================
+           Strikethrough
+           ========================================================================== */
+        .post-content del {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        /* ==========================================================================
+           Footnotes in Right Margin
+           ========================================================================== */
+        .footnote {
+            position: absolute;
+            right: -280px;        /* pushed farther right */
+            width: 200px;         /* slightly wider so text isn’t cramped */
+            font-size: 0.8rem;
+            line-height: 1.4;
+            color: var(--footnote-color);
+            padding: 0.5rem;
+            background-color: var(--bg-color);
+            border-left: 0.5px solid var(--footnote-color);
+            margin-top: -0.5rem;
+            margin-left: 1.5rem;  /* extra white-space buffer from main text */
+        }
+
+        .footnote-ref {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .footnote-ref:hover {
+            opacity: 0.8;
+        }
+
+        /* ==========================================================================
+           Responsive Design
+           ========================================================================== */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                max-width: 800px;
+                padding: 1rem;
+            }
+
+            .footnote {
+                position: static;
+                right: auto;
+                width: 100%;
+                margin: 1rem 0;
+                border-left: none;
+                border-top: 2px solid var(--accent-color);
+                background-color: var(--blockquote-bg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .search-bar {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .post-content {
+                font-size: 16px;
+            }
+
+            .post-content h1 { font-size: 1.8rem; }
+            .post-content h2 { font-size: 1.5rem; }
+            .post-content h3 { font-size: 1.3rem; }
+        }
+
+        /* ==========================================================================
+           Hidden Class for Search Filtering
+           ========================================================================== */
+        .hidden {
+            display: none;
+        }
+
+        /* ==========================================================================
+           Archive Toggle Button
+           ========================================================================== */
+        .archive-toggle {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+            margin-left: 1rem;
+        }
+
+        .archive-toggle:hover {
+            opacity: 0.8;
+        }
+
+        /* ==========================================================================
+           Archived Posts Styling
+           ========================================================================== */
+        .post.archived {
+            opacity: 0.7;
+            display: none; /* Hidden by default */
+        }
+
+        .post.archived.show-archived {
+            display: block; /* Show when archive toggle is active */
+        }
+
+        .post.archived .post-content::before {
+            content: "📦 ARCHIVED";
+            display: inline-block;
+            background-color: var(--border-color);
+            color: var(--text-color);
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            float: right;
+        }
+
+        /* ==========================================================================
+           Definition Lists
+           ========================================================================== */
+        .post-content dl {
+            margin: 1.5rem 0;
+        }
+
+        .post-content dt {
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-top: 1rem;
+        }
+
+        .post-content dd {
+            margin-left: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* === TOC in left margin ===================================== */
+        :root {
+            --toc-width: 220px;
+            --toc-tab: 28px;          /* width of the collapsed tab */
+        }
+
+        .toc-wrapper {
+            position: fixed;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            z-index: 200;
+            transition: transform 0.3s ease;
+        }
+
+        .toc-inner {
+            width: var(--toc-width);
+            max-height: 70vh;
+            overflow-y: auto;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-left: none;
+            border-radius: 0 6px 6px 0;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .toc-wrapper.collapsed {
+            transform: translateX(calc(-1 * var(--toc-width) + var(--toc-tab)));
+        }
+
+        .toc-tab {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: var(--toc-tab);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            background-color: var(--border-color);
+            color: var(--text-color);
+            border-radius: 0 6px 6px 0;
+            cursor: pointer;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            user-select: none;
+        }
+
+        .toc-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .toc-list li + li {
+            margin-top: 0.4rem;
+        }
+
+        .toc-list a {
+            color: var(--accent-color);
+            text-decoration: none;
+            line-height: 1.3;
+        }
+
+        .toc-list a:hover,
+        .toc-list a:focus {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 1024px) {
+            .toc-wrapper { display: none; } /* hide on narrow screens */
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with site title and search functionality -->
+    <header class="header">
+        <h1 class="site-title">Editorial Blog</h1>
+        <div class="search-container">
+            <input type="text" class="search-bar" placeholder="Search posts..." id="searchInput">
+            <button class="archive-toggle" id="archiveToggle">Show Archives</button>
+        </div>
+    </header>
+
+    <!-- Main content container with three-column layout -->
+    <div class="container">
+        <div class="left-spacer"></div>
+
+        <!-- Main content area where blog posts will be rendered -->
+        <main class="main-content" id="blogContent">
+            <!-- Blog posts will be dynamically inserted here -->
+        </main>
+
+        <!-- Right margin reserved for footnotes -->
+        <aside class="footnote-margin"></aside>
+    </div>
+
+    <script>
+        /* ==========================================================================
+           Markdown Content - Add your blog posts here in reverse chronological order
+           (newest posts first)
+           ========================================================================== */
+        const markdownPosts = [
+
+`# Writing Program
+
+### **8-Week Daily Writing Improvement Program**
+
+This program is designed to be flexible, allowing you to spend 10 minutes on some days and up to 30 minutes on others. The exercises build on each other, moving from foundational observation and idea generation to more refined crafting and revision techniques.
+
+**General Guidance for Each Day:**
+
+* **Warm-up (1-2 minutes):** Before starting the main exercise, consider quickly jotting down anything on your mind—ideas, concerns, observations. This helps clear your mental space.
+* **Cool-down (5-10 minutes on longer days):** After your writing session, take a short break (as suggested by Lydia Davis). Step away from your screen or notebook. Let your mind wander. You might find new ideas or insights emerge. If you have more time, use this for light reading or reviewing your notes.
+
+---
+
+**Week 1: Cultivating Observation and Idea Generation**
+
+This week focuses on ==opening your senses==[^1] and mind to the world around you, capturing raw material for your writing.
+
+* **Monday: The Writer's Notebook - Daily Capture (10-30 minutes)**
+    * **Exercise:** Start a dedicated writer's notebook (physical or digital). For 10-30 minutes, simply write down observations, snippets of overheard dialogue, ideas for stories, beginnings of sentences, or even just your complaints. The key here is quantity over quality and avoiding self-censorship.
+    * **Goal:** Establish a daily habit of capturing thoughts and observations without judgment.
+* **Tuesday: Sensory Deep Dive (10-20 minutes)**
+    * **Exercise:** Choose a single object or a small scene around you (e.g., your coffee cup, the view from your window, your desk). Spend 10-20 minutes writing about it using all five senses: what do you see, hear, smell, taste (if applicable), and feel (texture, temperature)?
+    * **Goal:** Sharpen your observational skills and make your physical world more present in your writing.
+* **Wednesday: Dialogue Listening (10-20 minutes)**
+    * **Exercise:** Pay close attention to conversations you hear today, whether in person, on a podcast, or on TV. Jot down interesting or "choicer bits" of dialogue. Don't worry about context; just capture the rhythm, natural phrasing, and unique expressions.
+    * **Goal:** Learn how people truly speak, including sentence fragments and natural pauses, to inform more realistic dialogue in your own work.
+* **Thursday: Curiosity Cultivation (10-20 minutes)**
+    * **Exercise:** Pick something you're mildly curious about today (e.g., how a particular appliance works, the history of a local landmark, why a certain phrase is used). Instead of immediately looking up the answer, spend 10-20 minutes simply *wondering* about it. Jot down your questions, assumptions, and what possibilities come to mind.
+    * **Goal:** Train your mind to explore a topic deeply before seeking quick answers, fostering more developed ideas.
+* **Friday: Found Material - Daily Bits (10-20 minutes)**
+    * **Exercise:** Look for "found material" in your daily life: a compelling sentence in an advertisement, an interesting phrase from a newspaper headline, a short text message, or even a line from a dream you remember. Copy it into your notebook and then briefly free-write for a few minutes, exploring what story or idea it might spark.
+    * **Goal:** Practice using external prompts to generate new ideas and loosen up your creative process.
+* **Saturday/Sunday: Review & Reflect (10-30 minutes)**
+    * **Exercise:** Spend time reviewing your writer's notebook entries from the week. Don't edit, just read them. Circle or highlight anything that stands out, any phrases you particularly like, or any ideas that feel promising. If you have more time, expand on one of these ideas for 15-20 minutes.
+    * **Goal:** Consolidate your observations and identify emerging patterns or interests, preparing for the next week's focus.
+
+---
+
+**Week 2: Engaging with Texts & Understanding Craft**
+
+This week shifts to actively engaging with published writing to understand how master writers achieve their effects.
+
+* **Monday: Close Reading - The Opening (10-30 minutes)**
+    * **Exercise:** Choose a favorite short story, essay, or the first chapter of a novel. Read the opening paragraph(s) very slowly. For 10-30 minutes, analyze *how* the author introduces the setting, character, or conflict. What specific words or sentence structures do they use? How do they hook your interest?
+    * **Goal:** Develop your analytical skills to understand specific craft choices.
+* **Tuesday: Stylistic Habit Hunt (10-20 minutes)**
+    * **Exercise:** Re-read a short passage from yesterday's text (or a new one). This time, look for less obvious stylistic habits: repetition of certain words or phrases, a particular sentence length pattern, or the use of alliteration or assonance. Jot down examples.
+    * **Goal:** Become aware of subtle stylistic elements that contribute to an author's voice.
+* **Wednesday: Poetic Economy (10-20 minutes)**
+    * **Exercise:** Read one or two poems. Focus on how poets use language with extreme economy. What is implied rather than stated? How do they create strong imagery with few words? Try to extract one vivid image or concise phrase from the poem and reflect on its power.
+    * **Goal:** Absorb a poem's concentrated attention to language and economy, which can inform your prose writing.
+* **Thursday: Reading for Rhythm (10-20 minutes)**
+    * **Exercise:** Choose a paragraph from a text you admire. Read it aloud, paying attention to its rhythm and flow. Then, try typing it out yourself, actively noting how punctuation (especially commas) affects the pace. Does it mirror the way you'd speak it?
+    * **Goal:** Understand how punctuation and sentence structure control the pace and flow of reading, and how to use it consciously.
+* **Friday: Learning from an Expert (10-20 minutes)**
+    * **Exercise:** If you have access to a literary analysis or an annotated edition of a text, spend 10-20 minutes reading the scholar's notes on a specific passage. How do they engage with the text? What do they highlight? Imagine you're trying to replicate their analytical approach in your own reading.
+    * **Goal:** Learn from skilled textual analysis to deepen your own reading and critical thinking.
+* **Saturday/Sunday: Reading a Classic & Reflection (10-30 minutes)**
+    * **Exercise:** Choose a classic short story or the first few pages of a classic novel (e.g., a short story by Chekhov, Poe, or a passage from Austen or Dickens). Read it without the pressure to "like" it. Simply read to observe the technique. What feels different about this "great work" compared to contemporary writing?
+    * **Goal:** Begin to immerse yourself in foundational literature to learn technique and broaden your literary palate.
+
+---
+
+**Week 3: Experimenting with Form & Structure**
+
+This week encourages you to play with different structures and constraints to push your creative boundaries and generate new ideas.
+
+* **Monday: Brevity Challenge (10-30 minutes)**
+    * **Exercise:** Take a simple event from your day (e.g., making breakfast, a short commute, a brief conversation). Write it down as briefly as possible, trying to convey the essence in a very short paragraph or even just a few sentences. Then, try to make it even shorter, cutting out unnecessary words.
+    * **Goal:** Practice conciseness and learn to convey meaning with fewer words.
+* **Tuesday: Non-Literary Form Story (10-30 minutes)**
+    * **Exercise:** Pick a non-literary form, like a letter of complaint, a recipe, a set of instructions, or an email. Use this form as the structure for a brief story. For instance, write a "recipe" for a bad relationship or a "letter of complaint" about an abstract concept.
+    * **Goal:** Explore how everyday forms can become unexpected containers for narrative, sparking creative approaches.
+* **Wednesday: Three-Line "Novel" (10-20 minutes)**
+    * **Exercise:** Using a public record (like an obituary or a local news snippet) or a simple fact you noted, try to compose a very short piece of writing—a "three-line novel"—that hints at a larger story. The challenge is to imply depth in extreme brevity.
+    * **Goal:** Develop skills in implication and conciseness, hinting at larger narratives with minimal words.
+* **Thursday: Sentences Out of Context (10-20 minutes)**
+    * **Exercise:** Go back to your writer's notebook. Find a phrase or sentence you noted that was effective on its own. Now, try to build a very short paragraph or two around it, giving it just enough new context to create a tiny narrative or a compelling image.
+    * **Goal:** Practice integrating found language and understanding how context shapes meaning.
+* **Friday: Dream as Raw Material (10-30 minutes)**
+    * **Exercise:** If you remember a dream, try to write it down, focusing on making it sound "dreamlike." Include irrational elements, short sentences, uncertainty, mystery, and strong imagery. If you don't recall a dream, imagine a waking "dreamlike" experience or create a short, illogical sequence.
+    * **Goal:** Experiment with irrationality and imagery, which can lead to fresh and unexpected writing.
+* **Saturday/Sunday: Self-Imposed Constraint (15-30 minutes)**
+    * **Exercise:** Choose a simple constraint for a short piece of writing (e.g., every sentence must start with a different letter of the alphabet for a short paragraph, or you can only use words beginning with a certain letter). Write a short paragraph or two adhering to this constraint.
+    * **Goal:** Challenge your habitual writing patterns and discover new possibilities through playful limitations.
+
+---
+
+**Week 4: Precision, Sound & Vocabulary**
+
+This week deepens your focus on the precise use of language, paying attention to word choice, sound, and the nuances of vocabulary.
+
+* **Monday: Work Hard on a Single Sentence (10-30 minutes)**
+    * **Exercise:** Choose one simple descriptive sentence from your notebook or a new observation (e.g., "The cat sat on the mat"). Now, spend 10-30 minutes revising and refining it. Try different verbs, adjectives, and adverbs. Experiment with word order. The goal is to get the description "exactly right," exploring every possibility.
+    * **Goal:** Sharpen your observational and language-handling skills, learning the power of precise word choice.
+* **Tuesday: Word Sounds - Read Aloud (10-20 minutes)**
+    * **Exercise:** Take a paragraph you've written or a short passage from a book you enjoy. Read it aloud slowly. Listen to the sound of the words together, the rhythm, and any alliteration or assonance. Does it flow well? Are there any awkward sounds? Try rephrasing a sentence or two to improve its sonic quality.
+    * **Goal:** Develop an ear for the musicality of language and how word sounds affect the reader's experience.
+* **Wednesday: Thesaurus Exploration (10-20 minutes)**
+    * **Exercise:** Pick a common word (e.g., "walk," "say," "look"). Open a thesaurus (digital or physical). Spend 10-20 minutes exploring its synonyms. Note the subtle differences in meaning and connotation. Then, write a few sentences, trying to use three or four of the near-synonyms in context, observing how each changes the nuance.
+    * **Goal:** Expand your vocabulary and understand the precise shades of meaning between similar words.
+* **Thursday: Word Origins (10-20 minutes)**
+    * **Exercise:** Choose 2-3 words you use often or find interesting. Look up their etymology (word origin) in an online etymology dictionary. How has their meaning evolved? Does knowing their origin give you a new appreciation for them or suggest new ways to use them? Briefly write about your findings.
+    * **Goal:** Gain a deeper understanding of words, allowing you to use them more accurately and with greater nuance.
+* **Friday: Vocabulary Register (10-20 minutes)**
+    * **Exercise:** Take a short piece of your own writing (or even a single paragraph). Identify some of the verbs and nouns. Are they primarily Anglo-Saxon (short, direct, often concrete) or Latinate (longer, often more abstract or formal)? Try rewriting a few sentences by swapping some Anglo-Saxon words for Latinate ones, and vice versa, to see how the "register" of the language changes.
+    * **Goal:** Become conscious of the different "registers" of vocabulary and how to choose words for specific effects and precision.
+* **Saturday/Sunday: Stylistic Imitation (15-30 minutes)**
+    * **Exercise:** Find a short paragraph from an author whose sentence structure you admire (perhaps someone known for complex or unusual sentences). Read it several times. Then, try to write your *own* paragraph about a different topic, consciously imitating that author's sentence structure, rhythm, and use of punctuation. Don't copy their content, just their style.
+    * **Goal:** Improve your own sentence construction by deconstructing and emulating the masters.
+
+---
+
+**Week 5: Revision & Refinement**
+
+This week shifts focus to the crucial process of revision, looking at your own work with fresh eyes and making deliberate choices for improvement.
+
+* **Monday: Revise Notes Constantly (10-30 minutes)**
+    * **Exercise:** Go back to your writer's notebook. Pick some entries from Week 1 or 2. Read them as if you've never seen them before. Are they clear? Does anything need to be expanded or clarified? Make brief notes or quick revisions directly in the notebook.
+    * **Goal:** Develop the habit of reading your own work with a critical, objective eye, improving both your revision skills and your initial writing clarity.
+* **Tuesday: Punctuation Power (10-20 minutes)**
+    * **Exercise:** Take a paragraph you've written. Experiment with changing the punctuation. Add or remove commas, try a semicolon instead of a period, or use an em dash. Read it aloud each time. How do these changes affect the pace, emphasis, and flow of the sentence?
+    * **Goal:** Gain conscious control over punctuation to affect sentence pace and flow.
+* **Wednesday: Ending with Impact (10-20 minutes)**
+    * **Exercise:** Choose a paragraph or short piece you've written. Focus specifically on the very last sentence. Does it provide a sense of closure or a lingering thought? Try rewriting it in 2-3 different ways, aiming for different effects (e.g., conclusive, ambiguous, surprising).
+    * **Goal:** Pay attention to the impact of endings (and beginnings) at the sentence and paragraph level.
+* **Thursday: Uncomfortable Revision (10-30 minutes)**
+    * **Exercise:** Pick a piece of writing you feel somewhat attached to, but suspect could be better. Identify one sentence or paragraph that feels a bit "off" or that you're just not sure about. Spend 10-30 minutes trying to revise just that section, even if it feels uncomfortable to change it. Don't aim for perfection, just explore alternatives.
+    * **Goal:** Confront the discomfort of revision and practice making difficult choices for the good of the writing.
+* **Friday: Embracing "Awkward" (10-20 minutes)**
+    * **Exercise:** Find a sentence or phrase in your own writing that feels a little "awkward" or unconventional, but that you suspect might have an interesting quality. Instead of immediately fixing it, consider why it's awkward. Does it serve a purpose? Can you lean into that awkwardness, perhaps by slightly rephrasing it to make it *deliberately* awkward for an effect?
+    * **Goal:** Learn to discern between genuinely clunky writing and unique stylistic choices, appreciating the potential of unconventional phrasing.
+* **Saturday/Sunday: Full Piece Revision (20-30 minutes)**
+    * **Exercise:** Select a short piece you've written during this program (e.g., a short notebook entry you expanded, a "three-line novel," or a brevity challenge piece). Devote 20-30 minutes to a full revision pass. Read it aloud. Check for clarity, conciseness, word choice, and flow. Make conscious choices to improve it.
+    * **Goal:** Integrate all the week's learning into a comprehensive revision session on a complete piece.
+
+---
+
+**Week 6: Developing Your Unique Voice & Sustaining Practice**
+
+This week focuses on integrating all you've learned to cultivate your unique voice and establish sustainable writing habits.
+
+* **Monday: Reflecting Your Being (10-30 minutes)**
+    * **Exercise:** Choose a topic you feel passionate about or have a unique perspective on. Write for 10-30 minutes, allowing your natural voice, character, and instincts to come through. Don't try to sound like anyone else. Trust what feels authentic to you, even if you can't articulate why.
+    * **Goal:** Allow your writing to naturally reflect your unique personality and perspective, fostering originality.
+* **Tuesday: Patient Pursuit (10-20 minutes)**
+    * **Exercise:** Think about a writing challenge you've encountered recently. Instead of rushing to "fix" it, spend 10-20 minutes simply sitting with the problem. Jot down different ways you might approach it, knowing that good writing often requires patience and continuous effort.
+    * **Goal:** Cultivate patience in your writing process and understand that improvement is an ongoing journey.
+* **Wednesday: Learning from Prose to Poetry (10-30 minutes)**
+    * **Exercise:** Take a short prose passage (from a book or your own writing). Convert it into lineated verse. Pay conscious attention to where you break lines, considering rhythm and emphasis. This isn't about writing a good poem, but about understanding how line breaks affect phrasing and meaning.
+    * **Goal:** Deepen your understanding of rhythm and phrasing by experiencing the structural differences between prose and poetry.
+* **Thursday: Connect the Dots (10-20 minutes)**
+    * **Exercise:** Look through your entire writer's notebook from the past five weeks. Do you see any recurring themes, interests, or stylistic tendencies emerging? Write a short reflection on what you've learned about your own writing habits, strengths, and areas for continued growth.
+    * **Goal:** Reflect on your progress and identify your unique writing inclinations.
+* **Friday: The "After Writing" Ritual (10-15 minutes)**
+    * **Exercise:** Today, after your writing session, deliberately leave at least 10-15 minutes completely open. Avoid checking email, social media, or starting another task. Go for a short walk, do some dishes, or just sit quietly. Notice if any new ideas or thoughts emerge related to your writing.
+    * **Goal:** Incorporate a cool-down period to allow your brain to process and offer further insights.
+* **Saturday/Sunday: Looking Ahead (20-30 minutes)**
+    * **Exercise:** Review the entire 6-week program. What exercises did you find most helpful? What habits do you want to continue? Brainstorm 2-3 specific writing goals for the next month and outline how you might integrate some of these daily exercises to achieve them.
+    * **Goal:** Solidify your learned habits and plan for continued growth beyond the structured program.
+
+---
+
+### **Week 7: Prose Lessons from Poetry**
+
+This week is dedicated to exploring how poetic principles can elevate your prose. We'll delve into rhythm, conciseness, imagery, and the power of individual words, all through the lens of poetry.
+
+**General Guidance for Each Day:**
+
+* **Access to Poetry:** Have a poetry anthology, a favorite poet's collection, or a reliable online poetry database handy.
+* **Read Aloud:** Many of these exercises benefit greatly from reading poetry and your own writing aloud.
+
+---
+
+**Week 7: What Prose Writers Can Learn from Poems/Poetry/Poets**
+
+* **Monday: The Power of Conciseness – Stripping Down Prose (10-30 minutes)**
+    * **Exercise:** Choose a short poem (even just a few lines) that you admire for its conciseness. Read it several times, noticing how much meaning is conveyed with so few words. Then, take a paragraph of your own prose (perhaps from your notebook) and try to "poet-ify" it. Can you reduce its word count by 20-30% while retaining or even strengthening its core meaning? Focus on eliminating redundant words and finding stronger, more precise verbs and nouns.
+    * **Goal:** Learn to distill your prose, making every word count, much like a poet does.
+* **Tuesday: Imagery & Sensory Detail – Painting with Words (10-20 minutes)**
+    * **Exercise:** Select a poem that is rich in vivid imagery. Read it slowly, paying attention to how the poet appeals to your five senses. Jot down specific lines that create strong visual, auditory, tactile, olfactory, or gustatory sensations. Now, take a simple descriptive sentence from your notebook and rewrite it, consciously adding at least two distinct sensory details inspired by your poetic study.
+    * **Goal:** Enhance your prose descriptions by incorporating precise, multi-sensory imagery.
+* **Wednesday: Rhythm & Flow – Hearing Your Sentences (10-20 minutes)**
+    * **Exercise:** Find a poem with a strong, discernible rhythm (it doesn't have to rhyme). Read it aloud several times, feeling its cadence. Then, take a paragraph of your own prose and read it aloud. Where does it flow smoothly? Where does it stumble? Experiment with changing sentence length, word order, or punctuation to create a more pleasing or deliberate rhythm in your prose, aiming for a "musicality" similar to what you observed in the poem.
+    * **Goal:** Develop an ear for the rhythm of your prose and learn to manipulate it for impact and readability.
+* **Thursday: Line Breaks & Emphasis – The Pause that Refreshes (10-30 minutes)**
+    * **Exercise:** Take a short prose passage (from a book or your own writing) and convert it into lineated verse. This isn't about making a "poem," but about consciously deciding where to break each line. How does breaking a line affect the emphasis of certain words or phrases? How does it change the reader's pace? Reflect on how these "line breaks" could inform where you naturally pause or emphasize ideas within your prose sentences.
+    * **Goal:** Understand how strategic pauses and visual breaks can create emphasis and impact in your prose.
+* **Friday: Figurative Language – Beyond the Literal (10-20 minutes)**
+    * **Exercise:** Read a poem that uses metaphors, similes, or personification effectively. Identify a few examples and analyze how they deepen the meaning or evoke emotion without stating it directly. Now, choose a concept or object from your daily life and try to describe it using at least two different pieces of figurative language (e.g., "the traffic was a slow-moving river," "the wind whispered secrets").
+    * **Goal:** Practice incorporating richer, more evocative figurative language into your prose to add depth and originality.
+* **Saturday/Sunday: Poetic Influence Reflection & Integration (20-30 minutes)**
+    * **Exercise:** Look back at the prose you've written this week. Can you identify moments where your study of poetry influenced your word choice, rhythm, or imagery? Choose one short piece of your own writing and consciously apply 2-3 lessons from this week's poetry study (e.g., make it more concise, add a new layer of sensory detail, adjust its rhythm). Write a short reflection on how exploring poetry has expanded your toolkit as a prose writer.
+    * **Goal:** Consolidate your learning from the week and make a conscious effort to integrate poetic principles into your prose.
+
+---
+
+### **Week 8: Deep Dive – Learning from a Masterful Passage**
+
+This week, we'll spend focused time with your chosen passage, dissecting its elements to understand its power and applying those insights to your own writing.
+
+**The Passage:**
+
+"The phenomenon of transference—how we all invent each other according to early blueprints—was Freud’s most original and radical discovery. The idea of infant sexuality and of the Oedipus complex can be accepted with a good deal more equanimity than the idea that the most precious and inviolate of entities—personal relations—is actually a messy jangle of misapprehensions, at best an uneasy truce between powerful solitary fantasy systems. Even (or especially) romantic love is fundamentally solitary, and has at its core a profound impersonality. The concept of transference at once destroys faith in personal relations and explains why they are tragic: We cannot know each other. We must grope around for each other through a dense thicket of absent others. We cannot see each other plain. A horrible kind of predetermination hovers over each new attachment we form. “Only connect,” E. M. Forster proposed. “Only we can’t,” the psychoanalyst knows."
+
+---
+
+**Week 8 Schedule:**
+
+* **Monday: Unpacking the Big Idea & Thesis (10-30 minutes)**
+    * **Exercise:** Read the passage aloud several times. What is the central argument or "big idea" the author is presenting? Identify the main thesis statement. How does the author introduce this complex idea? Jot down the core argument in your own words. Then, think about a complex idea or a strong opinion *you* hold. Try to draft an opening sentence or two that introduces your idea with similar clarity and directness, aiming to immediately engage the reader.
+    * **Goal:** Understand how to articulate a complex thesis clearly and provocatively at the outset of a discussion.
+* **Tuesday: The Power of Parentheticals & Dashes (10-20 minutes)**
+    * **Exercise:** Look closely at how the author uses dashes and parentheticals in the passage (e.g., "transference—how we all invent each other according to early blueprints—" or "(or especially)"). How do these structures add clarification, nuance, or a conversational aside without breaking the main sentence flow? Experiment by taking a sentence from your own writing and adding a parenthetical explanation or a dash-enclosed thought to elaborate on a point, observing how it enhances the original sentence.
+    * **Goal:** Learn to use dashes and parentheses effectively to enrich sentences with additional information or rhetorical flair.
+* **Wednesday: Precise Vocabulary & Imagery (10-30 minutes)**
+    * **Exercise:** Scan the passage for words or phrases that stand out for their precision and evocative power (e.g., "equanimity," "inviolate," "messy jangle," "dense thicket of absent others"). How do these specific choices contribute to the author's argument and tone? Select 3-5 of these words/phrases. Then, choose a topic you are currently writing about (or a simple descriptive scene). Try to incorporate one or two of *your own* chosen precise words or vivid images that carry similar weight and impact within your writing.
+    * **Goal:** Appreciate and emulate the use of highly precise and evocative vocabulary and imagery to strengthen your own prose.
+* **Thursday: Sentence Structure & Rhythm (10-20 minutes)**
+    * **Exercise:** Examine the varied sentence lengths and structures in the passage. Notice the long, complex sentences that build an argument ("The idea of infant sexuality...") and the shorter, impactful declarations ("We cannot know each other. We cannot see each other plain."). Read the passage aloud again, paying close attention to how these variations create rhythm and emphasize points. Now, take a paragraph of your own and consciously vary your sentence lengths, aiming for a similar ebb and flow that guides the reader through your ideas.
+    * **Goal:** Learn to strategically vary sentence structure and length to control pacing, create emphasis, and enhance readability.
+* **Friday: Argumentation & Rhetorical Devices (10-30 minutes)**
+    * **Exercise:** How does the author build their argument? Notice the logical progression, the use of contrasting ideas (e.g., "Only connect" vs. "Only we can't"), and the powerful concluding lines. Identify at least one rhetorical strategy (e.g., a strong declarative statement, an unexpected twist, a direct address). Then, draft a short argumentative paragraph on a topic you care about, consciously employing one of these strategies to strengthen your own point.
+    * **Goal:** Understand how to construct a compelling argument using clear logical steps and impactful rhetorical choices.
+* **Saturday/Sunday: Emulation & Integration (20-30 minutes)**
+    * **Exercise:** Choose a short piece of your own writing (a paragraph or two from your notebook, or something you're developing). Spend 20-30 minutes revising it with lessons from this week's deep dive in mind. Can you:
+        * Strengthen its central idea or opening?
+        * Add a well-placed parenthetical or dash?
+        * Incorporate more precise vocabulary or vivid imagery?
+        * Vary your sentence structure for better flow?
+        * Refine an argumentative point using a rhetorical strategy?
+    * **Goal:** Synthesize the week's learning by consciously applying multiple insights from the master passage to improve your own prose.
+
+    [^1]: This is a test footnote!
+
+
+`,
+
+`# The Krypteia 531 Program
+
+### Introduction to the Program
+
+Krypteia is a structured training program detailed in Jim Wendler's 5/3/1 Forever book, conceived as a preparatory phase or a "counter" to more intense protocols like Super Squats, with the primary goals of improving **conditioning, building size, enhancing general strength, and facilitating fat loss**. The program is typically divided into **three parts, spanning five cycles**, with Part 1 initially involving four training days per week before transitioning to three days per week in Parts 2 and 3. A defining feature of Krypteia is the imperative to complete workouts, excluding warm-ups and jumps, within a **strict time limit, often 45 minutes or less**, which promotes intense, compressed volume and efficient training. It emphasizes **many sets of few reps (e.g., sets of 5) for main lifts alongside a heavy focus on mandated assistance exercises** like dips, chins, dumbbell SLDLs with shrugs, and goblet squats, which are sometimes supersetted with the main lifts to improve work capacity and aid recovery. While not recommended for absolute beginners or those lacking perfect form, Krypteia has been shown to contribute to muscle growth, significant improvements in conditioning, and the healing of previous injuries for those with a solid training base.
+
+**Krypteia is a highly efficient, time-limited 5/3/1 training program (typically under 45 minutes per lifting session) designed to build strength, increase muscle size, and drastically improve conditioning through structured main lifts and intensive, supersetted assistance work**.
+
+### More Details
+
+#### Backgound Information: Wendler's General Training Philosophy
+
+Jim Wendler's training approach, particularly the 5/3/1 system, is built on several core principles designed for **long-term, sustainable progress**, emphasizing **quality over quantity** and the **importance of consistency and discipline**.
+
+*   **Core Principles of 5/3/1**:
+    *   **Start Too Light**: This applies to the training max (TM) and building a strong base before attempting heavier weights. It allows the body and mind to adapt and build a "training callous," like a flying 40-yard dash for momentum.
+    *   **Progress Slow**: Training maxes are increased gradually, typically by 5 pounds for bench/press and 10 pounds for squat/deadlift after each 3-week cycle. This slow progression ensures continued success without injury or stagnation.
+    *   **Use Multi-Joint Movements**: Focus on foundational compound exercises like squat, bench press, deadlift, and overhead press.
+    *   **Set PRs (Personal Records)**: The program encourages setting rep PRs on the final set of main lifts (e.g., 5+, 3+, or 1+ reps) rather than focusing on 1-rep maxes in training. This drives progress without excessive risk.
+    *   **Balance**: Training should be balanced across different aspects (lifting, jumping, throwing, conditioning, recovery) to ensure holistic development and prevent overtraining.`,
+
+`# Welcome to Editorial Blog
+
+This is your first blog post! You can add new posts by adding Markdown content to the \`markdownPosts\` array in the JavaScript section at the bottom of this HTML file.
+
+## Features Included
+
+This blog includes several powerful features:
+
+- **Typography-focused design** optimized for reading
+- **Dark mode support** that follows your system preference
+- **Live search** functionality in the top-right corner
+- **Comprehensive Markdown support** including tables, code blocks, and more
+- **Footnotes in the margin**[^1] for elegant annotations
+- **Responsive design** that works on all devices
+
+### Markdown Syntax Examples
+
+You can use all standard Markdown syntax:
+
+**Bold text**, *italic text*, and ~~strikethrough~~.
+
+> This is a blockquote that demonstrates the elegant styling applied to quoted content.
+
+#### Code Examples
+
+Inline \`code\` is supported, as well as code blocks:
+
+\`\`\`javascript
+function hello() {
+    console.log("Hello, world!");
+    return "This code block has syntax highlighting!";
+}
+\`\`\`
+
+#### Lists and Tables
+
+- Bullet points work perfectly
+- They maintain proper spacing
+- And visual hierarchy
+
+1. Numbered lists too
+2. With consistent formatting
+3. And proper alignment
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Dark Mode | ✅ | Automatic detection |
+| Search | ✅ | Live filtering |
+| Footnotes | ✅ | Margin placement |
+
+#### Text Highlighting
+
+You can ==highlight important text== using the double equals syntax.
+
+#### Links and Images
+
+[Links are styled](https://example.com) to match the editorial theme.
+
+Images are also supported and will be properly sized and styled.
+
+### Adding New Posts
+
+To add a new blog post:
+
+1. Scroll to the bottom of this HTML file
+2. Find the \`markdownPosts\` array in the JavaScript section
+3. Add your new Markdown content as the **first** item in the array
+4. Save the file and refresh the page
+
+New posts will automatically appear at the top of the blog!
+
+[^1]: This is a footnote that appears in the right margin, providing additional context without interrupting the reading flow.`,
+
+            `# Getting Started Guide
+
+This guide will help you understand how to use and customize your new editorial blog.
+
+## File Structure
+
+This is a completely self-contained HTML file that includes:
+
+- All CSS styling inline
+- JavaScript for Markdown parsing and search
+- Responsive design that works on GitHub Pages
+
+## Customization Options
+
+### Colors
+
+The color palette is defined in CSS variables at the top of the style section:
+
+- Light Blue/Grey: \`#D6E3F8\`
+- Medium Blue: \`#BAD7F2\`
+- Strong Blue: \`#8FBEEF\`
+- Accent Blue: \`#5C7AFF\`
+- Dark Blue/Grey: \`#2D3A56\`
+- Off-white: \`#F8F9FA\`
+
+### Typography
+
+The blog uses Georgia serif font for optimal readability, with:
+
+- 18px base font size
+- 1.6 line height for comfortable reading
+- Optimized column width for 60-65 characters per line
+
+### Adding Interactive Elements
+
+Since this is a complete HTML page, you can add:
+
+- Custom JavaScript functionality
+- Additional CSS animations
+- Interactive components
+- Form elements
+
+## Advanced Features
+
+### Footnotes
+
+Footnotes use a special syntax and appear in the right margin[^example]. On mobile devices, they appear inline for better readability.
+
+### Search Functionality
+
+The search bar in the top-right corner provides instant filtering:
+
+- Case-insensitive searching
+- Searches through all post content
+- Live results as you type
+
+### Dark Mode
+
+Dark mode is automatically detected based on your system preferences using the \`prefers-color-scheme\` media query.
+
+## GitHub Pages Deployment
+
+To deploy this blog:
+
+1. Create a new GitHub repository
+2. Upload this \`index.html\` file
+3. Enable GitHub Pages in repository settings
+4. Your blog will be live at \`https://username.github.io/repository-name\`
+
+That's it! No build process or configuration required.
+
+[^example]: This footnote demonstrates the margin placement feature that makes this blog unique.`
+        ];
+
+        /* ==========================================================================
+           Markdown Processing and Rendering Functions
+           ========================================================================== */
+
+        // Configure marked.js options for enhanced Markdown parsing
+        marked.setOptions({
+            highlight: function(code, lang) {
+                // Enable syntax highlighting with Prism.js
+                if (Prism.languages[lang]) {
+                    return Prism.highlight(code, Prism.languages[lang], lang);
+                }
+                return code;
+            },
+            breaks: true,
+            gfm: true // GitHub Flavored Markdown
+        });
+
+        /**
+         * Custom function to process text highlighting (==text== syntax)
+         * This extends standard Markdown to support highlighted text
+         */
+        function processHighlighting(text) {
+            return text.replace(/==(.*?)==/g, '<span class="highlight">$1</span>');
+        }
+
+        /**
+         * Process footnotes and create margin annotations
+         * Footnotes use [^label] syntax and are placed in the right margin
+         */
+        function processFootnotes(html) {
+            const footnoteRefs = [];
+            const footnoteContents = {};
+
+            // Extract footnote definitions from the content
+            html = html.replace(/\[\^([^\]]+)\]:\s*(.+?)(?=\n\n|\n\[|\n$|$)/gs, (match, label, content) => {
+                footnoteContents[label] = content.trim();
+                return '';
+            });
+
+            // Replace footnote references with interactive elements
+            html = html.replace(/\[\^([^\]]+)\]/g, (match, label) => {
+                const footnoteId = `footnote-${label}-${Date.now()}`;
+                footnoteRefs.push({ label, content: footnoteContents[label], id: footnoteId });
+                return `<sup><a href="#${footnoteId}" class="footnote-ref" data-footnote="${footnoteId}">${footnoteRefs.length}</a></sup>`;
+            });
+
+            return { html, footnoteRefs };
+        }
+
+        /**
+         * Create and position footnote elements in the right margin
+         */
+        function createFootnotes(footnoteRefs, postElement) {
+            footnoteRefs.forEach((footnote, index) => {
+                if (footnote.content) {
+                    const footnoteEl = document.createElement('div');
+                    footnoteEl.className = 'footnote';
+                    footnoteEl.id = footnote.id;
+                    footnoteEl.innerHTML = `<strong>${index + 1}.</strong> ${footnote.content}`;
+
+                    // Find the corresponding footnote reference in the text
+                    const refElement = postElement.querySelector(`[data-footnote="${footnote.id}"]`);
+                    if (refElement) {
+                        // Position footnote vertically aligned with its reference
+                        const refRect = refElement.getBoundingClientRect();
+                        const postRect = postElement.getBoundingClientRect();
+                        const relativeTop = refRect.top - postRect.top;
+
+                        footnoteEl.style.top = `${relativeTop}px`;
+                        postElement.appendChild(footnoteEl);
+
+                        // Add click handler for smooth scrolling to footnote
+                        refElement.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            footnoteEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        });
+                    }
+                }
+            });
+        }
+
+        /**
+         * Render a single blog post from Markdown to HTML
+         */
+        function renderPost(markdown, index) {
+            // Check if post is archived by looking for 'ARCHIVED: ' at the beginning
+            const isArchived = markdown.trimStart().startsWith('ARCHIVED: ');
+            let processedMarkdown = markdown;
+
+            // Remove the ARCHIVED: prefix from the content
+            if (isArchived) {
+                processedMarkdown = markdown.replace(/^\s*ARCHIVED:\s*/, '');
+            }
+
+            // Process custom highlighting syntax
+            processedMarkdown = processHighlighting(processedMarkdown);
+
+            // Convert Markdown to HTML
+            let html = marked.parse(processedMarkdown);
+
+            // Process footnotes
+            const { html: finalHtml, footnoteRefs } = processFootnotes(html);
+
+            // Create post container element
+            const postElement = document.createElement('article');
+            postElement.className = isArchived ? 'post archived' : 'post';
+            postElement.id = `post-${index}`;
+            postElement.innerHTML = `<div class="post-content">${finalHtml}</div>`;
+
+            // Add footnotes if any exist
+            if (footnoteRefs.length > 0) {
+                // Use setTimeout to ensure DOM is rendered before positioning footnotes
+                setTimeout(() => createFootnotes(footnoteRefs, postElement), 100);
+            }
+
+            return postElement;
+        }
+
+        /**
+         * Render all blog posts to the page
+         */
+        function renderBlog() {
+            const blogContent = document.getElementById('blogContent');
+            blogContent.innerHTML = ''; // Clear existing content
+
+            // Render each post (posts are already in reverse chronological order)
+            markdownPosts.forEach((post, index) => {
+                const postElement = renderPost(post, index);
+                blogContent.appendChild(postElement);
+            });
+        }
+
+        /* ==========================================================================
+           Search Functionality with Archive Support
+           ========================================================================== */
+
+        // Track archive toggle state
+        let showingArchives = false;
+
+        /**
+         * Filter blog posts based on search query
+         * Searches through all text content of posts, including archived ones
+         */
+        function filterPosts(query) {
+            const posts = document.querySelectorAll('.post');
+            const searchTerm = query.toLowerCase().trim();
+            const isSearching = searchTerm !== '';
+
+            posts.forEach(post => {
+                const isArchived = post.classList.contains('archived');
+                const postText = post.textContent.toLowerCase();
+                const matchesSearch = isSearching ? postText.includes(searchTerm) : true;
+
+                if (isSearching) {
+                    // When searching, show all matching posts (including archived)
+                    if (matchesSearch) {
+                        post.classList.remove('hidden');
+                        if (isArchived) {
+                            post.classList.add('show-archived');
+                        }
+                    } else {
+                        post.classList.add('hidden');
+                        if (isArchived) {
+                            post.classList.remove('show-archived');
+                        }
+                    }
+                } else {
+                    // When not searching, respect archive toggle state
+                    post.classList.remove('hidden');
+                    if (isArchived) {
+                        if (showingArchives) {
+                            post.classList.add('show-archived');
+                        } else {
+                            post.classList.remove('show-archived');
+                        }
+                    }
+                }
+            });
+        }
+
+        /**
+         * Toggle archive visibility
+         */
+        function toggleArchives() {
+            showingArchives = !showingArchives;
+            const archiveToggle = document.getElementById('archiveToggle');
+            const searchInput = document.getElementById('searchInput');
+
+            // Update button text
+            archiveToggle.textContent = showingArchives ? 'Hide Archives' : 'Show Archives';
+
+            // If there's an active search, re-filter to respect the new archive state
+            if (searchInput.value.trim() !== '') {
+                filterPosts(searchInput.value);
+            } else {
+                // Just toggle archive visibility
+                const archivedPosts = document.querySelectorAll('.post.archived');
+                archivedPosts.forEach(post => {
+                    if (showingArchives) {
+                        post.classList.add('show-archived');
+                    } else {
+                        post.classList.remove('show-archived');
+                    }
+                });
+            }
+        }
+
+        /* ==========================================================================
+           TOC Generation
+           ========================================================================== */
+        function buildTOC() {
+            const posts   = document.querySelectorAll('.post');
+            const wrapper = document.createElement('div');
+            wrapper.className = 'toc-wrapper collapsed';
+            wrapper.innerHTML = `
+                <div class="toc-inner">
+                    <ul class="toc-list"></ul>
+                </div>
+                <div class="toc-tab">☰ TOC</div>
+            `;
+
+            const list = wrapper.querySelector('.toc-list');
+            posts.forEach((post, idx) => {
+                const h1   = post.querySelector('h1');
+                const text = (h1 ? h1.textContent : `Post ${idx + 1}`).trim();
+                const id   = `post-${idx}`;
+                post.id    = id;                       // anchor target
+                list.insertAdjacentHTML(
+                    'beforeend',
+                    `<li><a href="#${id}">${text}</a></li>`
+                );
+            });
+
+            // Collapse / expand
+            wrapper.addEventListener('mouseenter', () => wrapper.classList.remove('collapsed'));
+            wrapper.addEventListener('mouseleave', () => wrapper.classList.add('collapsed'));
+            document.body.appendChild(wrapper);
+        }
+
+        /* ==========================================================================
+           Event Listeners and Initialization
+           ========================================================================== */
+
+        // Initialize the blog when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            renderBlog();
+            buildTOC();
+
+            // Set up search functionality
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function(e) {
+                filterPosts(e.target.value);
+            });
+
+            // Set up archive toggle functionality
+            const archiveToggle = document.getElementById('archiveToggle');
+            archiveToggle.addEventListener('click', toggleArchives);
+
+            // Handle window resize for footnote repositioning
+            let resizeTimeout;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    // Re-render blog to reposition footnotes after resize
+                    renderBlog();
+                    buildTOC();
+                }, 250);
+            });
+        });
+
+        /* ==========================================================================
+           INSTRUCTIONS FOR ADDING NEW BLOG POSTS
+           ========================================================================== */
+
+        /*
+         * TO ADD A NEW BLOG POST:
+         *
+         * 1. Add your new Markdown content as the FIRST item in the markdownPosts array above
+         * 2. Use standard Markdown syntax for formatting
+         * 3. For footnotes, use [^label] in text and [^label]: content at the end
+         * 4. For highlighting, use ==text to highlight==
+         * 5. Save the file and refresh the page
+         *
+         * TO ARCHIVE A POST:
+         *
+         * Add 'ARCHIVED: ' at the very beginning of the markdown content.
+         * Archived posts:
+         * - Don't appear when browsing normally
+         * - Still show up in search results
+         * - Can be revealed using the "Show Archives" button
+         * - Are marked with a 📦 ARCHIVED badge
+         *
+         * Example new post:
+         *
+         * `# My New Post Title
+         *
+         * This is my new blog post content with **bold text** and a footnote[^1].
+         *
+         * ## Subheading
+         *
+         * More content here with ==highlighted text==.
+         *
+         * [^1]: This footnote will appear in the right margin.`
+         *
+         * Example archived post:
+         *
+         * `ARCHIVED: # My Old Post Title
+         *
+         * This post is archived and won't show up normally.`
+         *
+         * Simply add it as the first item in the markdownPosts array like this:
+         *
+         * const markdownPosts = [
+         *     `# My New Post Title...`, // <- Your new post here
+         *     `ARCHIVED: # My Old Post...`, // <- Archived post
+         *     `# Welcome to Editorial Blog...`, // <- Existing posts below
+         * ];
+         */
+    </script>
+</body>
+</html>
